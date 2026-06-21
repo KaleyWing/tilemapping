@@ -190,7 +190,7 @@ function draw() {
     applyBounce();
 
     drawObstacles();
-    drawTiles();
+    drawTiles(tileData);
 
     drawPlayer();
   } 
@@ -219,8 +219,8 @@ function updateCamera() {
   camY = lerp(camY, targetY, CAM_SMOOTHING);
 }
 
-function drawTiles() {
-  const layers = tileData.layers; // there are 2 layers for now
+function drawTiles(jsonFile) {
+  const layers = jsonFile.layers; 
   for (let l = layers.length - 1; l > -1; l--) {
     // for each layer
     for (let i = 0; i < layers[l].tiles.length; i++) {
@@ -298,27 +298,7 @@ function drawObstacles() {
     // Animated glow — pulses using sin(frameCount)
     let glow = map(sin(frameCount * 0.05 + i * 1.2), -1, 1, 40, 90);
 
-    push();
-
-    // Lava base
-    fill(180, 40, 0);
-    rect(x, y, s, s, 4);
-
-    // Lava surface patches
-    fill(220, 80, 10);
-    rect(x + s * 0.1, y + s * 0.1, s * 0.4, s * 0.35, 2);
-    rect(x + s * 0.55, y + s * 0.5, s * 0.35, s * 0.3, 2);
-    rect(x + s * 0.2, y + s * 0.6, s * 0.25, s * 0.25, 2);
-
-    // Crack lines
-    stroke(100, 20, 0);
-    strokeWeight(1.5);
-    line(x + s * 0.3, y, x + s * 0.5, y + s * 0.4);
-    line(x + s * 0.5, y + s * 0.4, x + s * 0.7, y + s * 0.6);
-    line(x, y + s * 0.5, x + s * 0.3, y + s * 0.7);
-    line(x + s * 0.3, y + s * 0.7, x + s * 0.6, y + s);
-
-    pop();
+    push()
   }
 }
 
