@@ -749,6 +749,7 @@ function checkWhirlpools() {
     }
   }
 }
+//hihhuihjnhbj
 
 function updateMoveSpeed() {
   moveSpeed = playerInWater() ? 4 : PLAYER_SPEED;

@@ -4,7 +4,6 @@
 
 > **Note for students:** This section is included in example files only to help you study. Do not include it in your Side Quest submissions.
 
-This example builds on Example 1 by replacing the auto-scrolling world with a free roam top-down world. The player moves freely across a large world and a smooth-follow camera keeps them in view. Enemy waves are triggered by the player's position. A minimap shows where enemies and the boss are at all times. A giant orange blob boss spawns when the player enters the boss zone at the top of the world.
 
 - **Free roam world** — the world is 1600×2000px; the player moves in world coordinates and is constrained to world boundaries with `constrain()`
 - **Smooth-follow camera** — `camX` and `camY` track the top-left of the visible area; `lerp()` moves the camera smoothly toward the player each frame; `translate(-camX, -camY)` shifts all world drawing into screen coordinates
