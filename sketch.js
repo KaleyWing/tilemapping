@@ -33,7 +33,7 @@ let camZoom = 0.7;
 // ------------------------------------------------------------
 // PLAYER CONFIGURATION
 // ------------------------------------------------------------
-const PLAYER_SPEED = 15;
+const PLAYER_SPEED = 35;
 
 // ------------------------------------------------------------
 // PLAYER
@@ -72,8 +72,7 @@ let obstacleData;
 let obstacles = [];
 
 let tileData;
-let tiles = [];
-
+let fishArea;
 // ------------------------------------------------------------
 // WAVE SYSTEM
 // Each wave has a triggerY — spawns when player.y < triggerY.
@@ -122,6 +121,7 @@ function preload() {
   enemyData = loadJSON("data/enemies.json");
   obstacleData = loadJSON("data/obstacles.json");
   tileData = loadJSON("data/map.json");
+  fishArea = loadJSON("data/fisharea.json");
 
   // Uncomment to load sounds:
   // shootSound     = loadSound("assets/sounds/shoot.wav");
@@ -145,19 +145,13 @@ const TILE_SIZE = 50;
 // ============================================================
 function setup() {
   createCanvas(800, 450);
-  WORLD_W = TILE_SIZE * tileData.mapWidth; // total world width in pixels
-  WORLD_H = TILE_SIZE * tileData.mapHeight; // total world height in pixels
+  WORLD_W = TILE_SIZE * (tileData.mapWidth + fishArea.mapWidth); // total world width in pixels
+  WORLD_H = TILE_SIZE * (tileData.mapHeight + fishArea.mapHeight); // total world height in pixels
 
   // Build obstacle objects from JSON
   for (let i = 0; i < obstacleData.obstacles.length; i++) {
     let o = obstacleData.obstacles[i];
     obstacles.push({ x: o.x, y: o.y, size: o.size });
-  }
-
-  const tilesArray = tileData.layers?.[0]?.tiles || [];
-  for (let i = 0; i < tilesArray.length; i++) {
-    const t = tilesArray[i];
-    tiles.push({ x: t.x, y: t.y, id: t.id });
   }
 
   // Start camera so player is visible
@@ -173,6 +167,7 @@ function setup() {
 // ============================================================
 function draw() {
   background(20);
+  console.log(player.x / 50, player.y / 50);
 
   updateCamera();
 
@@ -185,15 +180,22 @@ function draw() {
 
   drawBackground();
 
+  // if player 3/4 into bird area
+  if (player.x > ((TILE_SIZE * tileData.mapWidth) / 4) * 3) {
+    // add end of fish area boundary later
+    drawTiles(fishArea); // fish area
+    console.log("fish area drawn");
+  }
+
   if (gameState === STATE_PLAY) {
     handleInput();
     applyBounce();
 
     drawObstacles();
-    drawTiles(tileData);
+    drawTiles(tileData); // bird area
 
     drawPlayer();
-  } 
+  }
 
   pop(); // restore screen coordinates
 
@@ -220,14 +222,38 @@ function updateCamera() {
 }
 
 function drawTiles(jsonFile) {
-  const layers = jsonFile.layers; 
+  const layers = jsonFile.layers;
   for (let l = layers.length - 1; l > -1; l--) {
-    // for each layer
+    // for each layer we will....
+    if (layers[l].name === "spikes") {
+      fill("orange"); // there are 4 spike subtypes
+    } else if (layers[l].name === "rock") {
+      fill(0);
+    } else if (layers[l].name == "background rock") {
+      fill(150);
+    } else if (layers[l].name === "background sky") {
+      fill(200, 230, 255);
+    } else if (layers[l].name === "checkpoint") {
+      fill("pink");
+    } else if (layers[l].name === "water") {
+      fill(0, 0, 240);
+    } else if (layers[l].name === "key") {
+      fill("yellow");
+    } else if (layers[l].name === "seaweed") {
+      fill("green");
+    } else if (layers[l].name === "whirlpool") {
+      fill(80);
+    } else if (layers[l].name === "sand") {
+      fill(250, 250, 200);
+    } else if (layers[l].name === "wind") {
+      fill(255);
+    }
+
     for (let i = 0; i < layers[l].tiles.length; i++) {
-      let t = layers[l].tiles[i];
+      let t = layers[l].tiles[i]; // for every tile we will....
 
       if (
-        // skip if offscreen
+        // skip drawing if offscreen
         t.x + t.size < camX ||
         t.x - t.size > camX + width ||
         t.y + t.size < camY ||
@@ -235,36 +261,21 @@ function drawTiles(jsonFile) {
       )
         continue;
 
+      let mapXOffset = 0; // where the json is in relation to 0,0
+      let mapYOffset = 0;
+
+      if (jsonFile == fishArea) {
+        mapXOffset = TILE_SIZE * (tileData.mapWidth - 33);
+        mapYOffset = TILE_SIZE * tileData.mapHeight;
+      }
+
       push();
 
-      let x = t.x * TILE_SIZE;
-      let y = t.y * TILE_SIZE;
-      if (t.id === "0") {
-        fill("gray"); // spike 1
-      } else if (t.id === "1") {
-        fill("light blue"); // spike 2
-      } else if (t.id === "2") {
-        fill("purple"); // spike 3
-      } else if (t.id === "3") {
-        // for the real json file
-        fill("orange"); // spike 4
-      } else if (t.id === "4") {
-        // key
-        fill("yellow");
-      } else if (t.id === "5") {
-        fill(0); // rock
-      } else if (t.id === "6") {
-        fill(0, 0, 200); // water
-      } else if (t.id === "7") {
-        fill("blue"); // water top
-      } else if (t.id === "8") {
-        fill(80, 80, 100); // cave bg
-      } else if (t.id === "9") {
-        fill(200, 240, 255); //background sky
-      } else if (t.id === "10") {
-        fill("pink");
-      } else {
-        fill("green");
+      let x = t.x * TILE_SIZE + mapXOffset;
+      let y = t.y * TILE_SIZE + mapYOffset;
+
+      if (t.id === "7") {
+        fill("blue"); // water top ... figure this out later
       }
       rect(x, y, TILE_SIZE, TILE_SIZE);
 
@@ -298,7 +309,7 @@ function drawObstacles() {
     // Animated glow — pulses using sin(frameCount)
     let glow = map(sin(frameCount * 0.05 + i * 1.2), -1, 1, 40, 90);
 
-    push()
+    push();
   }
 }
 

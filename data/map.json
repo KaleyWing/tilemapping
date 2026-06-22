@@ -12405,7 +12405,7 @@
       "collider": false
     },
     {
-      "name": "bg green",
+      "name": "background sky",
       "tiles": [
         { "id": "9", "x": 0, "y": 5 },
         { "id": "9", "x": 1, "y": 5 },
