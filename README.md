@@ -1,4 +1,4 @@
-# Week 6 Example 2 — Free Roam Top-Down with Boss Battle
+# Merged version of bird fish game(does not work)
 
 ## What This Example Demonstrates
 
