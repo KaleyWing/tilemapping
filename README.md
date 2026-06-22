@@ -2,9 +2,12 @@
 
 ## What This Example Demonstrates
 
+<<<<<<< HEAD
 > **Note for students:** This section is included in example files only to help you study. Do not include it in your Side Quest submissions.
 
 
+=======
+>>>>>>> 61485c2d006cfac2f3c58fed95142e9dc225a132
 - **Free roam world** — the world is 1600×2000px; the player moves in world coordinates and is constrained to world boundaries with `constrain()`
 - **Smooth-follow camera** — `camX` and `camY` track the top-left of the visible area; `lerp()` moves the camera smoothly toward the player each frame; `translate(-camX, -camY)` shifts all world drawing into screen coordinates
 - **`push()` / `pop()` around translate** — everything inside draws in world coordinates; HUD and minimap are drawn after `pop()` in screen coordinates so they stay fixed on screen
